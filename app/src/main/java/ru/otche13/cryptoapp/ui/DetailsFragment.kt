@@ -1,62 +1,104 @@
 package ru.otche13.cryptoapp.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_details.*
 import ru.otche13.cryptoapp.R
+import ru.otche13.cryptoapp.databinding.FragmentDetailsBinding
+import ru.otche13.cryptoapp.utils.Resource
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [DetailsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 @AndroidEntryPoint
 class DetailsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentDetailsBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel by viewModels<CryptoViewModel>()
+    private val bundleArgs: DetailsFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_details, container, false)
+        _binding = FragmentDetailsBinding.inflate(inflater, container, false)
+        return binding.root
+
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment DetailsFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            DetailsFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val cryptoItemArgs = bundleArgs.cryptoItem
+
+        activity?.toolbar?.title = cryptoItemArgs.name
+        activity?.appbar?.elevation=4F
+
+        viewModel.getCryptoInfo(cryptoItemArgs.id)
+
+
+        viewModel.InfoLiveData.observe(viewLifecycleOwner) { responce ->
+            when (responce) {
+                is Resource.Success -> {
+                    progress_bar.visibility = View.INVISIBLE
+                    responce.data?.let { cryptoInfo ->
+
+                        cryptoInfo.image.large.let {
+
+                            Glide.with(this).load(cryptoInfo.image.large)
+                                .apply(RequestOptions.bitmapTransform( CircleCrop()))
+                                .into(binding.detailsImage)
+                        }
+                        binding.detailsCryptInformation.text= replaceString(cryptoInfo.description.en)
+                        binding.detailsCryptCategories.text=cryptoInfo.categories.joinToString()
+
+
+                    }
+                }
+                is Resource.Error -> {
+                    progress_bar.visibility = View.INVISIBLE
+                    responce.data?.let {
+                        Log.e("checkData", "MainFragment: error: ${it}")
+                    }
+                }
+                is Resource.Loading -> {
+                    progress_bar.visibility = View.VISIBLE
                 }
             }
+        }
+    }
+
+    fun replaceString(args: String):String{
+        val info= mutableListOf<String>()
+        args.forEach { info.add(it.toString()) }
+        val newInfo= mutableListOf<String>()
+        var const=0
+
+        for (i in 0 until info.size){
+
+            if (info[i]=="<"){
+                const++
+            }
+
+            if(const==0){
+                newInfo.add(info[i])
+            }
+
+            if (info[i]==">"){
+                const--
+            }
+        }
+
+        return newInfo.joinToString("","","")
     }
 }

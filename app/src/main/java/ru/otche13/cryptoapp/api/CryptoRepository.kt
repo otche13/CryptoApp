@@ -10,6 +10,7 @@ class CryptoRepository @Inject constructor(
 
     suspend fun getCryptsEur()= cryptoService.getCryptoListEur()
 
+    suspend fun getCryptoInformation(coin:String) =cryptoService.getCryptoInformation(coin)
 
 
 
