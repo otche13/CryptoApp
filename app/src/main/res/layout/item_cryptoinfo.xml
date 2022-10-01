@@ -48,7 +48,6 @@
             android:textSize="14sp"
             app:layout_constraintStart_toEndOf="@+id/crypto_image"
             app:layout_constraintTop_toBottomOf="@+id/crypto_name"
-
             />
 
         <TextView
@@ -76,8 +75,6 @@
             android:textSize="14sp"
             android:text="+4.05%"
             android:fontFamily="@font/plusjakartasans"
-            android:textColor="@color/color_pricechangeplus"
-
 
             />
 

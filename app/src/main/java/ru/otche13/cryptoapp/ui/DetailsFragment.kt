@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
+
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -15,7 +15,6 @@ import com.bumptech.glide.request.RequestOptions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_details.*
-import ru.otche13.cryptoapp.R
 import ru.otche13.cryptoapp.databinding.FragmentDetailsBinding
 import ru.otche13.cryptoapp.utils.Resource
 
@@ -44,8 +43,16 @@ class DetailsFragment : Fragment() {
         activity?.toolbar?.title = cryptoItemArgs.name
         activity?.appbar?.elevation=4F
 
-        viewModel.getCryptoInfo(cryptoItemArgs.id)
+        if (savedInstanceState==null){
+            checkNetwork()
+        }
 
+        binding.buttonErrorDetails.setOnClickListener {
+                checkNetwork()
+            viewModel.getCryptoInfo(cryptoItemArgs.id)
+        }
+
+        viewModel.getCryptoInfo(cryptoItemArgs.id)
 
         viewModel.InfoLiveData.observe(viewLifecycleOwner) { responce ->
             when (responce) {
@@ -61,8 +68,6 @@ class DetailsFragment : Fragment() {
                         }
                         binding.detailsCryptInformation.text= replaceString(cryptoInfo.description.en)
                         binding.detailsCryptCategories.text=cryptoInfo.categories.joinToString()
-
-
                     }
                 }
                 is Resource.Error -> {
@@ -76,6 +81,7 @@ class DetailsFragment : Fragment() {
                 }
             }
         }
+
     }
 
     fun replaceString(args: String):String{
@@ -101,4 +107,22 @@ class DetailsFragment : Fragment() {
 
         return newInfo.joinToString("","","")
     }
+
+    private fun checkNetwork(){
+        val state = viewModel.isNetworkAvailable(context)
+        if (!state) {
+            dialog_error_details.visibility = View.VISIBLE
+            scroll_details.visibility=View.INVISIBLE
+        } else {
+            dialog_error_details.visibility = View.INVISIBLE
+            scroll_details.visibility=View.VISIBLE
+
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding=null
+    }
+
 }

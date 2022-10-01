@@ -2,10 +2,12 @@ package ru.otche13.cryptoapp.ui
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
@@ -18,6 +20,7 @@ import ru.otche13.cryptoapp.adapter.MainAdapter
 import ru.otche13.cryptoapp.databinding.FragmentMainBinding
 import ru.otche13.cryptoapp.utils.Resource
 
+@Suppress("UNREACHABLE_CODE")
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
@@ -32,7 +35,7 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding= FragmentMainBinding.inflate(inflater,container,false)
+        _binding = FragmentMainBinding.inflate(inflater, container, false)
         return binding.root
 
     }
@@ -40,10 +43,21 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (savedInstanceState==null){
+            checkNetwork()
+        }
+
+        binding.buttonErrorMain.setOnClickListener {
+            val state = viewModel.isNetworkAvailable(context)
+            if(state) { dialog_error.visibility = View.INVISIBLE
+            binding.recyclerMain.visibility= View.VISIBLE
+            changeList(true)}
+        }
+
         initAdapter()
         changeList(true)
 
-        activity?.toolbar?.title = "Список криптовалют"
+        activity?.toolbar?.title ="Список криптовалют"
         activity?.appbar?.elevation=0F
 
         val usdChip = binding.chipUsd
@@ -66,6 +80,7 @@ class MainFragment : Fragment() {
                 eurChip.isChecked = false
             }
             changeList(usdChip.isChecked)
+            viewModel.changeCancarancy(usdChip.isChecked)
         }
 
         eurChip.setOnClickListener {
@@ -75,11 +90,11 @@ class MainFragment : Fragment() {
                 usdChip.isChecked = false
                 eurChip.isChecked = true
             }
-
+            viewModel.changeCancarancy(usdChip.isChecked)
             changeList(usdChip.isChecked)
-
         }
-        //прослушиваем LiveData
+
+
         viewModel.ListLiveData.observe(viewLifecycleOwner) { responce ->
             when (responce) {
                 is Resource.Success -> {
@@ -99,22 +114,43 @@ class MainFragment : Fragment() {
                 }
             }
         }
+
+
     }
 
     private fun changeList(chip:Boolean) {
+
         if (chip) {
-            viewModel.getCryptolistUsd()
-        } else {
-            viewModel.getCryptolistEur()
+                viewModel.getCryptolistUsd()
+            } else {
+                viewModel.getCryptolistEur()
             }
         }
 
     private fun initAdapter() {
-        mainAdapter = MainAdapter()
+        mainAdapter = MainAdapter(viewModel)
         recycler_main.apply {
             adapter = mainAdapter
             layoutManager = LinearLayoutManager(activity)
         }
+    }
+
+    private fun checkNetwork(){
+        val state = viewModel.isNetworkAvailable(context)
+        if (!state) {
+            dialog_error.visibility = View.VISIBLE
+            binding.recyclerMain.visibility= View.INVISIBLE
+        } else {
+            dialog_error.visibility = View.INVISIBLE
+            binding.recyclerMain.visibility= View.VISIBLE
+            changeList(true)
+
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding=null
     }
 
 }

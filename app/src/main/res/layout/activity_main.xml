@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".app.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -19,6 +19,7 @@
         <androidx.appcompat.widget.Toolbar
             app:title="список"
             android:id="@+id/toolbar"
+            android:fontFamily="@font/roboto"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             tools:ignore="MissingConstraints"

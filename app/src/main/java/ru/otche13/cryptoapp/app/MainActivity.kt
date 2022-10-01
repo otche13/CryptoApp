@@ -31,8 +31,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
-
     override fun onSupportNavigateUp(): Boolean {
         navHostFragment.navController.navigateUp()
         return super.onSupportNavigateUp()
