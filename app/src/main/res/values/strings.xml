@@ -1,3 +1,9 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">CryptoApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="Erorr_DIALOG">Случилась какая-то ошибка :( \tПопробуем снова?</string>
+    <string name="USD">USD</string>
+    <string name="EUR">EUR</string>
+    <string name="ListCrypt" >Список криптовалют</string>
+    <string name="textForButton" >Повторить</string>
 </resources>
