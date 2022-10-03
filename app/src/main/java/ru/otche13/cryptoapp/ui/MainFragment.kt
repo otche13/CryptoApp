@@ -2,12 +2,10 @@ package ru.otche13.cryptoapp.ui
 
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
@@ -47,52 +45,60 @@ class MainFragment : Fragment() {
             checkNetwork()
         }
 
-        binding.buttonErrorMain.setOnClickListener {
-            val state = viewModel.isNetworkAvailable(context)
-            if(state) { dialog_error.visibility = View.INVISIBLE
-            binding.recyclerMain.visibility= View.VISIBLE
-            changeList(true)}
-        }
-
-        initAdapter()
-        changeList(true)
-
         activity?.toolbar?.title ="Список криптовалют"
         activity?.appbar?.elevation=0F
 
         val usdChip = binding.chipUsd
         val eurChip = binding.chipEur
+        initAdapter()
+        changeList(true)
 
-        mainAdapter.setOnItemClickListener {
-            val bundle = bundleOf("cryptoItem" to it)
-            view.findNavController().navigate(
-                R.id.action_mainFragment_to_detailsFragment,
-                bundle
-            )
-
-        }
-
-        usdChip.setOnClickListener {
-            if (usdChip.isChecked) {
-                eurChip.isChecked = false
-            } else {
-                usdChip.isChecked = true
-                eurChip.isChecked = false
+        // onClickButtonError
+            binding.buttonErrorMain.setOnClickListener {
+                val state = viewModel.isNetworkAvailable(context)
+                if (state) {
+                    dialog_error.visibility = View.INVISIBLE
+                    binding.recyclerMain.visibility = View.VISIBLE
+                    changeList(true)
+                }
             }
-            changeList(usdChip.isChecked)
-            viewModel.changeCancarancy(usdChip.isChecked)
-        }
 
-        eurChip.setOnClickListener {
-            if (eurChip.isChecked) {
-                usdChip.isChecked = false
-            } else {
-                usdChip.isChecked = false
-                eurChip.isChecked = true
+
+        // onClickChipItem
+            mainAdapter.setOnItemClickListener {
+                val bundle = bundleOf("cryptoItem" to it)
+                view.findNavController().navigate(
+                    R.id.action_mainFragment_to_detailsFragment,
+                    bundle
+                )
             }
-            viewModel.changeCancarancy(usdChip.isChecked)
-            changeList(usdChip.isChecked)
-        }
+
+
+        // onClickChipUsd
+            usdChip.setOnClickListener {
+                if (usdChip.isChecked) {
+                    eurChip.isChecked = false
+                } else {
+                    usdChip.isChecked = true
+                    eurChip.isChecked = false
+                }
+                changeList(usdChip.isChecked)
+                viewModel.changeCancarancy(usdChip.isChecked)
+            }
+
+
+        // onClickChipEur
+            eurChip.setOnClickListener {
+                if (eurChip.isChecked) {
+                    usdChip.isChecked = false
+                } else {
+                    usdChip.isChecked = false
+                    eurChip.isChecked = true
+                }
+                viewModel.changeCancarancy(usdChip.isChecked)
+                changeList(usdChip.isChecked)
+            }
+
 
 
         viewModel.ListLiveData.observe(viewLifecycleOwner) { responce ->
