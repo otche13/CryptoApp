@@ -64,7 +64,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:text="Категория"
-                android:fontFamily="@font/robotobold"
+                android:fontFamily="@font/roboto"
                 android:textColor="@color/black"
                 android:textSize="20sp"/>
 

@@ -37,9 +37,6 @@ class CryptoViewModel @Inject constructor(private val repository: CryptoReposito
          }
      }
 
-
-
-
     fun getCryptolistUsd() {
         viewModelScope.launch {
             _ListLiveData.postValue(Resource.Loading())
@@ -67,7 +64,6 @@ class CryptoViewModel @Inject constructor(private val repository: CryptoReposito
     }
 
      fun getCryptoInfo(crypt:String) {
-
          viewModelScope.launch {
              _InfoLiveData.postValue(Resource.Loading())
              try {
@@ -79,6 +75,7 @@ class CryptoViewModel @Inject constructor(private val repository: CryptoReposito
              }
          }
      }
+
 
      fun isNetworkAvailable(context: Context?): Boolean {
          if (context == null) return false

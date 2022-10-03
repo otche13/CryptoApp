@@ -38,21 +38,24 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val cryptoItemArgs = bundleArgs.cryptoItem
-
         activity?.toolbar?.title = cryptoItemArgs.name
-        activity?.appbar?.elevation=4F
+        activity?.appbar?.elevation = 4F
 
-        if (savedInstanceState==null){
+        if (savedInstanceState == null) {
             checkNetwork()
         }
 
-        binding.buttonErrorDetails.setOnClickListener {
+        //onClickButtonError()
+            binding.buttonErrorDetails.setOnClickListener {
                 checkNetwork()
-            viewModel.getCryptoInfo(cryptoItemArgs.id)
-        }
+                viewModel.getCryptoInfo(cryptoItemArgs.id)
+            }
+
 
         viewModel.getCryptoInfo(cryptoItemArgs.id)
+
 
         viewModel.InfoLiveData.observe(viewLifecycleOwner) { responce ->
             when (responce) {
@@ -63,11 +66,12 @@ class DetailsFragment : Fragment() {
                         cryptoInfo.image.large.let {
 
                             Glide.with(this).load(cryptoInfo.image.large)
-                                .apply(RequestOptions.bitmapTransform( CircleCrop()))
+                                .apply(RequestOptions.bitmapTransform(CircleCrop()))
                                 .into(binding.detailsImage)
                         }
-                        binding.detailsCryptInformation.text= replaceString(cryptoInfo.description.en)
-                        binding.detailsCryptCategories.text=cryptoInfo.categories.joinToString()
+                        binding.detailsCryptInformation.text =
+                            replaceString(cryptoInfo.description.en)
+                        binding.detailsCryptCategories.text = cryptoInfo.categories.joinToString()
                     }
                 }
                 is Resource.Error -> {
@@ -84,29 +88,33 @@ class DetailsFragment : Fragment() {
 
     }
 
-    fun replaceString(args: String):String{
-        val info= mutableListOf<String>()
+    //удаление со строки ссылок
+    fun replaceString(args: String): String {
+
+        val info = mutableListOf<String>()
         args.forEach { info.add(it.toString()) }
-        val newInfo= mutableListOf<String>()
-        var const=0
+        val newInfo = mutableListOf<String>()
+        var const = 0
 
-        for (i in 0 until info.size){
+        for (i in 0 until info.size) {
 
-            if (info[i]=="<"){
+            if (info[i] == "<") {
                 const++
             }
 
-            if(const==0){
+            if (const == 0) {
                 newInfo.add(info[i])
             }
 
-            if (info[i]==">"){
+            if (info[i] == ">") {
                 const--
             }
         }
 
-        return newInfo.joinToString("","","")
+
+        return newInfo.joinToString("", "", "")
     }
+
 
     private fun checkNetwork(){
         val state = viewModel.isNetworkAvailable(context)
